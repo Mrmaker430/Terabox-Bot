@@ -4,7 +4,7 @@ from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 
 # Load environment variables
-from python-dotenv import load_dotenv
+from dotenv import load_dotenv
 load_dotenv()
 
 # Get the bot token from the environment variable
