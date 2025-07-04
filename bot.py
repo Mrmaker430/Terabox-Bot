@@ -1,17 +1,21 @@
 import os
 import requests
 from telegram import Update
-from telegram.ext import Updater, CommandHandler, CallbackContext
+from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
+
+# Load environment variables
+from python-dotenv import load_dotenv
+load_dotenv()
 
 # Get the bot token from the environment variable
 TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
 
 # Function to start the bot
-def start(update: Update, context: CallbackContext) -> None:
-    update.message.reply_text('Welcome! Send me a Terabox link to download or stream.')
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await update.message.reply_text('Welcome! Send me a Terabox link to download or stream.')
 
 # Function to handle Terabox links
-def handle_link(update: Update, context: CallbackContext) -> None:
+async def handle_link(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if context.args:
         terabox_url = context.args[0]
         api_url = f"https://teraboxdownloder.rishuapi.workers.dev/?url={terabox_url}"
@@ -22,23 +26,23 @@ def handle_link(update: Update, context: CallbackContext) -> None:
             data = response.json()
             video_name = data.get('name', 'Unknown Video')
             play_url = data.get('playUrl', 'No URL found')
-            update.message.reply_text(f'Video Name: {video_name}\nDownload Link: {play_url}')
+            await update.message.reply_text(f'Video Name: {video_name}\nDownload Link: {play_url}')
         else:
-            update.message.reply_text('Failed to fetch the video. Please check the link.')
+            await update.message.reply_text('Failed to fetch the video. Please check the link.')
     else:
-        update.message.reply_text('Please provide a Terabox link.')
+        await update.message.reply_text('Please provide a Terabox link.')
 
-def main() -> None:
-    updater = Updater(TELEGRAM_BOT_TOKEN)
+async def main() -> None:
+    application = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).build()
     
     # Register handlers
-    updater.dispatcher.add_handler(CommandHandler("start", start))
-    updater.dispatcher.add_handler(CommandHandler("link", handle_link))
+    application.add_handler(CommandHandler("start", start))
+    application.add_handler(CommandHandler("link", handle_link))
     
     # Start the bot
-    updater.start_polling()
-    updater.idle()
+    await application.run_polling()
 
 if __name__ == '__main__':
-    main()
-      
+    import asyncio
+    asyncio.run(main())
+        
