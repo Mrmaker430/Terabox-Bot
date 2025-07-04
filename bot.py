@@ -3,10 +3,6 @@ import requests
 from telegram import Update
 from telegram.ext import Updater, CommandHandler, CallbackContext
 
-# Load environment variables
-from dotenv import load_dotenv
-load_dotenv()
-
 # Get the bot token from the environment variable
 TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
 
